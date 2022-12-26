@@ -41,17 +41,24 @@ def get_data():
    instructions = get_instructions_from_lines(instruction_lines)
    return (stacks, instructions)
 
-def perform_instruction(stacks, instruction):
+def perform_instruction(stacks, instruction, one_by_one):
    num, from_crate, to_crate = instruction
 
-   for _ in range(num):
-      item = stacks[from_crate].pop()
-      stacks[to_crate].append(item)
+   if one_by_one:
+      for _ in range(num):
+         item = stacks[from_crate].pop()
+         stacks[to_crate].append(item)
+   else:
+      items = []
+      for _ in range(num):
+         items.append(stacks[from_crate].pop())
+      for item in items[::-1]:
+         stacks[to_crate].append(item)
 
    return stacks
 
-def perform_instructions(stacks, instructions):
-   return reduce(lambda s, inst: perform_instruction(s, inst), instructions, stacks)
+def perform_instructions(stacks, instructions, one_by_one=True):
+   return reduce(lambda s, inst: perform_instruction(s, inst, one_by_one), instructions, stacks)
 
 def get_soln(final_stacks):
    soln = ''
@@ -59,11 +66,15 @@ def get_soln(final_stacks):
       soln += final_stacks[k][-1]
    return soln
 
-def main():
+def run(one_by_one=True):
    stacks, instructions = get_data()
-   final_stacks = perform_instructions(stacks, instructions)
-   soln = get_soln(final_stacks)
+   final_stacks_one_by_one = perform_instructions(stacks, instructions, one_by_one)
+   soln = get_soln(final_stacks_one_by_one)
    print(soln)
+
+def main():
+   run(True)
+   run(False)
 
 if __name__ == "__main__":
    main()
