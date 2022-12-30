@@ -1,6 +1,6 @@
 from collections import deque
 
-DATA_PATH = './data/input_12.txt'
+DATA_PATH = './test_data/input_12.txt'
 
 def get_input_data():
    data = []
@@ -76,10 +76,54 @@ def get_distance_to_end(grid, min_distances):
    end_coord = get_coord(grid, 'E')
    return min_distances[end_coord]
 
+def get_coords(grid, letter):
+   coords = []
+   for i in range(len(grid)):
+      for j in range(len(grid[0])):
+         if grid[i][j] == letter:
+            coords.append((i, j))
+   return coords
+
+def get_part_two(grid):
+   start_coord = get_coord(grid, 'S')
+   grid[start_coord[0]][start_coord[1]] = 'a'
+
+   a_coords = get_coords(grid, 'a')
+   
+   explored = set()
+   distances = {}
+   q = deque()
+
+   for coord in a_coords:
+      q.append((coord, 0))
+
+   while q:
+      curr_node, curr_distance = q.popleft()
+
+      if curr_node in explored:
+         continue
+      explored.add(curr_node)
+
+      if curr_node not in distances:
+         distances[curr_node] = curr_distance
+      else:
+         distances[curr_node] = min(curr_distance, distances[curr_node])
+
+      accessible_neighbors = get_accessible_neighbors(curr_node, grid)
+      for neighbor in accessible_neighbors:
+         q.append((neighbor, curr_distance+1))
+
+   return distances
+
 def main():
    grid = get_input_data()
 
-   min_distances = get_min_distances(grid)
+   # min_distances = get_min_distances(grid)
+   # print(min_distances)
+   # distance_to_end = get_distance_to_end(grid, min_distances)
+   # print(distance_to_end)
+
+   min_distances = get_part_two(grid)
    print(min_distances)
    distance_to_end = get_distance_to_end(grid, min_distances)
    print(distance_to_end)
