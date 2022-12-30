@@ -1,7 +1,9 @@
 import re
 from collections import deque
 
-DATA_PATH = './test_data/input_15.txt'
+DATA_PATH = './data/input_15.txt'
+
+BOUNDS = (0, 4000000)
 
 def get_input_data():
    data = {}
@@ -9,83 +11,71 @@ def get_input_data():
       lines = f.read().splitlines()
       for line in lines:
          s = re.split(' |=|;|,|:', line)
-         sensor = tuple(map(int, [s[3], s[6]]))
-         beacon = tuple(map(int, [s[13], s[16]]))
+         sensor = tuple(map(int, [s[6], s[3]]))
+         beacon = tuple(map(int, [s[16], s[13]]))
          data[sensor] = beacon
    return data
 
 def get_grid(data):
-   max_x, max_y = 0, 0
-   for sensor, beacon in data.items():
-      max_x = max(max_x, sensor[0], beacon[0])
-      max_y = max(max_y, sensor[1], beacon[1])
-
-   grid = [['_' for _ in range(max_y+1)] for _ in range(max_x+1) ]
+   grid = {}
 
    for sensor, beacon in data.items():
-      grid[sensor[0]][sensor[1]] = 'S'
-      grid[beacon[0]][beacon[1]] = 'B'
+      grid[sensor] = 'S'
+      grid[beacon] = 'B'
 
    return grid
 
 def get_manhattan_distance(point_a, point_b):
    return abs(point_a[0]-point_b[0]) + abs(point_a[1]-point_b[1])
 
-def get_manhattan_neighbors(grid, coord):
-   neighbors = []
-   for i in (-1, 0, 1):
-      for j in (-1, 0, 1):
-         new_i = coord[0]+i
-         new_j = coord[1]+j
-         if new_i < 0 or new_j < 0:
-            continue
-         if new_i >= len(grid) or new_j >= len(grid[0]):
-            continue
-         if abs(i) != abs(j):
-            neighbors.append((new_i, new_j))
-   return neighbors
 
-def explore_for_point(grid, sensor, beacon):
-   manhattan_distance = get_manhattan_distance(sensor, beacon)
-   print(manhattan_distance)
+def get_row_data(data, row_to_investigate):
+   row_data = {}
 
-   explored = set()
+   for sensor, beacon in data.items():
+      if sensor[0] == row_to_investigate:
+         row_data[sensor[1]] = 'S'
+      if beacon[0] == row_to_investigate:
+         row_data[beacon[1]] = 'B'
 
-   q = deque()
-   q.append((sensor, 0))
+   return row_data
 
-   while q:
-      curr_node, curr_distance = q.popleft()
-      if curr_node in explored:
+def explore_for_sensor(sensor, beacon, row_data, row_to_investigate):
+   sensor_distance = get_manhattan_distance(sensor, beacon)
+   coord_perpendicular = (row_to_investigate, sensor[1])
+   row_distance = get_manhattan_distance(sensor, coord_perpendicular)
+
+   if row_distance > sensor_distance:
+      return
+
+   distance_remaining = sensor_distance - row_distance
+
+   for delta in range(-distance_remaining, distance_remaining+1):
+      curr_j = sensor[1]+delta
+      curr = (row_to_investigate, curr_j)
+      if curr_j in row_data:
          continue
-      if curr_distance > manhattan_distance:
-         continue
+      row_data[curr_j] = '#'
 
-      explored.add(curr_node)
-
-      if grid[curr_node[0]][curr_node[1]] == '_':
-         grid[curr_node[0]][curr_node[1]] = '#'
-
-      neighbors = get_manhattan_neighbors(grid, curr_node)
-      print(curr_node, neighbors)
-
-      for neighbor in neighbors:
-         q.append((neighbor, curr_distance+1))
-
-   for g in grid:
-      print(g)
-      #print("".join(g))
-      
-def explore_all_sensors(sensor_beacon_dict, grid):
-   for sensor, beacon in sensor_beacon_dict.items():
-      explore_for_point(grid, sensor, beacon)
+def get_sensed_spaces_in_row(row_data):
+   count = 0
+   for key, value in row_data.items():
+      if value == '#':
+         count += 1
+   return count
 
 def main():
+   row_to_investigate = 2000000 #10
+
    data = get_input_data()
 
-   grid = get_grid(data)
+   row_data = get_row_data(data, row_to_investigate)
 
-   explore_all_sensors(data, grid)
+   for sensor, beacon in data.items():
+      explore_for_sensor(sensor, beacon, row_data, row_to_investigate)
+
+   soln = get_sensed_spaces_in_row(row_data)
+   print(soln)
 
 if __name__ == "__main__":
    main()
