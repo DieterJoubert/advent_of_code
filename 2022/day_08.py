@@ -1,12 +1,13 @@
-DATA_PATH = './data/input_8.txt'
+from functools import reduce
 
-class Highest(object):
-   def __init__(self, height):
-      self.left = 0
-      self.right = 0
-      self.top = 0
-      self.bottom = 0
-      self.height = height
+DATA_PATH = './data/input_08.txt'
+
+direction_to_delta = {
+   'N': (-1, 0),
+   'S': (+1, 0),
+   'W': (0, -1),
+   'E': (0, +1)
+}
 
 def get_grid():
    grid = []
@@ -16,95 +17,103 @@ def get_grid():
          grid.append(list(map(int, line)))
    return grid
       
-def initialize_lookup(grid):
-   lookup = {}
-   for i in range(len(grid)):
-      for j in range(len(grid[0])):
-         height = grid[i][j]
-         new_el = Highest(height)
-         lookup[(i, j)] = new_el
-   return lookup
+def is_visible_in_direction(grid, i, j, direction):
+   this_height = grid[i][j]
+   delta = direction_to_delta[direction]
+   neighbor = (i + delta[0], j + delta[1])
 
-def get_four_neighbors(i, j, lookup):
-   top = lookup[(i-1, j)]
-   bottom = lookup[(i+1, j)]
-   left = lookup[(i, j-1)]
-   right = lookup[(i, j+1)]
-   return top, bottom, left, right
+   while True:
+      if neighbor[0] < 0 or neighbor[0] >= len(grid):
+         break
+      if neighbor[1] < 0 or neighbor[1] >= len(grid[0]):
+         break
 
-def explore_tree(i, j, lookup):
-   curr = lookup[(i,j)]
-   top, bottom, left, right = get_four_neighbors(i, j, lookup)
+      neighbor_height = grid[neighbor[0]][neighbor[1]]
+      if neighbor_height >= this_height:
+         return False
 
-   curr.left = max(left.height, left.left)
-   curr.right = max(right.height, right.right)
-   curr.top = max(top.height, top.top)
-   curr.bottom = max(bottom.height, bottom.bottom)
+      neighbor = (neighbor[0] + delta[0], neighbor[1] + delta[1])
 
-def get_completed_lookup(grid):
-   lookup = initialize_lookup(grid)
+   return True
+   
+def is_node_visible(grid, i, j):
+   if i == 0 or j == 0 or i == len(grid)-1 or j == len(grid[0])-1:
+      return True
 
-   for i in range(1, len(grid)-1):
-      for j in range(1, len(grid[0])-1):
-         explore_tree(i, j, lookup)
+   for direction in direction_to_delta.keys():
+      check_direction = is_visible_in_direction(grid, i, j, direction)
+      if check_direction:
+         return True
 
-   for i in range(len(grid)-2, 0, -1):
-      for j in range(len(grid[0])-2, 0, -1):
-         explore_tree(i, j, lookup)
+   return False
 
-   return lookup
-
-def get_visible_from_lookup(grid, lookup):
-   visible = [[False for _ in range(len(grid[0]))] for _ in range(len(grid))]
+def get_visibility_grid(grid):
+   is_visible = [[False for _ in range(len(grid[0]))] for _ in range(len(grid))]
 
    for i in range(len(grid)):
       for j in range(len(grid[0])):
-         if i == 0 or j == 0 or i == len(grid)-1 or j == len(grid[0])-1:
-            visible[i][j] = True
-         else:
-            curr = lookup[(i,j)]
-            height = curr.height
-            if height > min(curr.left, curr.right, curr.top, curr.bottom):
-               visible[i][j] = True
-   return visible
+         is_visible[i][j] = is_node_visible(grid, i, j)
 
-def get_num_visible(visible):
+   return is_visible
+
+def count_visible_trees(is_visible_grid):
    total = 0
-   for row in visible:
-      total += row.count(True)
+   for row in is_visible_grid:
+      for node in row:
+         if node:
+            total += 1
    return total
 
-def explore_scenic_score(i, j, grid):
-   grid_height = len(grid)
-   grid_width = len(grid[0])
+def get_viewing_distance_in_direction(grid, i, j, direction):
+   distance = 0
 
-   for x in range(i-1, 0, -1):
-      grid[x][j]
+   this_height = grid[i][j]
+   delta = direction_to_delta[direction]
+   neighbor = (i + delta[0], j + delta[1])
 
-   for x in range(i+1, grid_height):
-      grid[x][j]
+   while True:
+      if neighbor[0] < 0 or neighbor[0] >= len(grid):
+         break
+      if neighbor[1] < 0 or neighbor[1] >= len(grid[0]):
+         break
 
-   for x in range(j-1, 0, -1):
-      grid[i][x]
+      distance += 1
 
-   for x in range(j+1, grid_width):
-      grid[i][x]
+      neighbor_height = grid[neighbor[0]][neighbor[1]]
+      if neighbor_height >= this_height:
+         break
 
-def get_max_scenic_score(grid):
-   best_distance 
+      neighbor = (neighbor[0] + delta[0], neighbor[1] + delta[1])
+
+   return distance
+
+def get_viewing_distance(grid, i, j):
+   distances = []
+
+   for direction in direction_to_delta.keys():
+      distances.append(get_viewing_distance_in_direction(grid, i, j, direction))
+
+   return reduce(lambda x, y: x * y, distances)
+
+def get_best_viewing_distance(grid):
+   best = 0
+
    for i in range(1, len(grid)-1):
       for j in range(1, len(grid[0])-1):
-         distance = explore_scenic_score(i, j, grid)
+         viewing_distance = get_viewing_distance(grid, i, j)
+         best = max(best, viewing_distance)
+
+   return best
 
 def main():
    grid = get_grid()
-   lookup = get_completed_lookup(grid)
-   visible = get_visible_from_lookup(grid, lookup)
-   num_visible = get_num_visible(visible)
-   print(num_visible)
 
-   max_scenic_score = get_max_scenic_score(grid)
-   print(max_scenic_score)
+   is_visible_grid = get_visibility_grid(grid)
+   visibility_count = count_visible_trees(is_visible_grid)
+   print(visibility_count)
+
+   best_viewing_distance = get_best_viewing_distance(grid)
+   print(best_viewing_distance)
 
 if __name__ == "__main__":
    main()
