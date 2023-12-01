@@ -5,11 +5,6 @@ def get_data():
         lines = f.read().splitlines()
         return lines
 
-# def get_line_calibration_value(line):
-#    first = next(x for x in line if x.isnumeric())
-#    last = next(x for x in line[::-1] if x.isnumeric())
-#    return int(first + last)
-
 int_map = {
    'one': 1,
    'two': 2, 
@@ -31,7 +26,7 @@ def check_for_hidden_int(segment):
       return int_map[segment[:5]]
    return None 
    
-def get_foobar(line):
+def get_line_calibration_value_with_hidden(line):
   first, last = None, None
   
   for idx in range(len(line)):
@@ -56,14 +51,25 @@ def get_foobar(line):
   
   return int(str(first) + str(last))
       
+def part_1(data):
+   def get_line_calibration_value(line):
+      first = next(x for x in line if x.isnumeric())
+      last = next(x for x in line[::-1] if x.isnumeric())
+      return int(first + last)
+   
+   calibration_values = [get_line_calibration_value(x) for x in data]
+   print(sum(calibration_values))
+
+   
+def part_2(data):
+  calibration_values = [get_line_calibration_value_with_hidden(x) for x in data]
+  print(sum(calibration_values))
+
 def main():
   data = get_data()
 
-  calibration_values = [get_foobar(x) for x in data]
-
-  #print(calibration_values)
-  print(sum(calibration_values))
-
+  part_1(data)
+  part_2(data)
 
 if __name__ == "__main__":
   main()
