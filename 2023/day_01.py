@@ -60,7 +60,6 @@ def part_1(data):
    calibration_values = [get_line_calibration_value(x) for x in data]
    print(sum(calibration_values))
 
-   
 def part_2(data):
   calibration_values = [get_line_calibration_value_with_hidden(x) for x in data]
   print(sum(calibration_values))
