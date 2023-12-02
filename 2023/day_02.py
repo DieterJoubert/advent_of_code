@@ -1,3 +1,5 @@
+from functools import reduce
+
 DATA_PATH = './data/input_02.txt'
 
 BAG_CONTENT = {
@@ -52,8 +54,28 @@ def part_1(data):
 	possible_games = get_possible_game_indexes(data)
 	print(sum(possible_games))
 
+def get_min_bags(data):
+	min_bags = []
+
+	for game in data:
+		this_min_bag = {}
+
+		for reveal in game:
+			for color, num in reveal.items():
+
+				if color not in this_min_bag:
+					this_min_bag[color] = num
+				else:
+					this_min_bag[color] = max(this_min_bag[color], num)
+
+		min_bags.append(this_min_bag)
+
+	return min_bags
+
 def part_2(data):
-	pass
+	min_bags = get_min_bags(data)
+	powers = [reduce(lambda a, b: a*b, x) for x in map(lambda foo: foo.values(), min_bags)]
+	print(sum(powers))
 
 def main():
 	data = get_data()
@@ -61,4 +83,4 @@ def main():
 	part_2(data)
 
 if __name__ == "__main__":
-  main()
+	main()
