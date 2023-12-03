@@ -1,6 +1,6 @@
 from functools import reduce
 
-DATA_PATH = './test_data/input_03.txt'
+DATA_PATH = './data/input_03.txt'
 
 def get_data():
 	with open(DATA_PATH) as f:
@@ -24,34 +24,52 @@ def get_neighbors(data, i, j):
 
 	return neighbors
 
-def get_part_numbers(data):
-	part_numbers = []
+def get_number_and_neighbors(data):
+	number_and_neighbors = []
 
 	for i in range(len(data)):
-		row = data[i]
+		this_row = data[i]
 
-		for j in range(len(row)):
+		current_num = ''
+		current_neighbors = []
+
+		for j in range(len(this_row)):
 			this_cell = data[i][j]
 
-			if this_cell == '.':
-				continue
 			if this_cell.isnumeric():
+				current_num += this_cell
 				neighbors = get_neighbors(data, i, j)
+				for n in neighbors:
+						current_neighbors.append(n)
 
-				has_adjacent_part = any(x != '.' and not x.isnumeric() for x in neighbors)
+			elif current_num:
+				number_and_neighbors.append([int(current_num), current_neighbors])
+				current_num = ''
+				current_neighbors = []
+		
+		if current_num:
+			number_and_neighbors.append([int(current_num), current_neighbors])
+			current_num = ''
+			current_neighbors = []
 
-				if has_adjacent_part:
-					part_numbers.append(int(this_cell))
+	return number_and_neighbors
 
-	return part_numbers
 
 def part_1(data):
-	part_numbers = get_part_numbers(data)
+	numbers_and_neighbors = get_number_and_neighbors(data)
+	#print(numbers_and_neighbors)
+
+	part_numbers = []
+
+	for (number, neighbors) in numbers_and_neighbors:
+		if any(x != '.' and not x.isnumeric() for x in neighbors):
+			part_numbers.append(number)
+
 	print(sum(part_numbers))
 
 def main():
 	data = get_data()
-	print(data)
+	#print(data)
 
 	part_1(data)
 
