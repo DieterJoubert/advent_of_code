@@ -123,8 +123,7 @@ def get_neighboring_numbers(data, i, j):
 
 	return neighboring_numbers
 
-
-def part_2(data):
+def get_gears_with_two_neighbors(data):
 	gears_with_two_neighbors = []
 
 	for i in range(len(data)):
@@ -137,13 +136,17 @@ def part_2(data):
 				if len(neighboring_numbers) == 2:
 					gears_with_two_neighbors.append(neighboring_numbers)
 
+	return gears_with_two_neighbors
+
+def part_2(data):
+	gears_with_two_neighbors = get_gears_with_two_neighbors(data)
+
 	total = 0
 	for x in gears_with_two_neighbors:
 		total += (x[0] * x[1])
 
 	print('part 2: ' + str(total))
 				
-
 def main():
 	data = get_data()
 
