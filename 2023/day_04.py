@@ -33,7 +33,7 @@ def part_1(data):
 		score = process_card(winning_numbers, my_numbers)
 
 		if score > 0:
-			total_points += (1 * (2 ** (score-1)))
+			total_points += (2 ** (score-1))
 
 	print(total_points)
 
