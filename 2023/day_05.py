@@ -44,22 +44,39 @@ def part_1(initial_seeds, conversion_maps):
 	final_values = [convert_seed(x, conversion_maps) for x in initial_seeds]
 	print(min(final_values))
 
+def reverse_convert(location, conversion_maps):
+	for single_map in conversion_maps[::-1]:
+		for (destination_start, source_start, range_length) in single_map:
+			if location >= destination_start and location < destination_start+range_length:
+				delta = location - destination_start
+				location = source_start + delta
+				break
+	return location
+
+def check_if_in_initial(result, seed_ranges):
+	for (range_start, range_length) in seed_ranges:
+		if result >= range_start and result < range_start+range_length:
+			return True
+	return False
+
 def part_2(initial_seeds, conversion_maps):
-	initial_seed_ranges = list(zip(initial_seeds[0::2], initial_seeds[1::2]))
+	seed_ranges = list(zip(initial_seeds[0::2], initial_seeds[1::2]))
 
-	min_found = float('inf')
+	curr = 0
+	while True:
+		result = reverse_convert(curr, conversion_maps)
+		if check_if_in_initial(result, seed_ranges):
+			print(curr)
+			break
+		curr += 1
+		if curr % 1000000 == 0:
+			print(curr)
 
-	for (initial_seed, seed_range) in initial_seed_ranges:
-		for x in range(initial_seed, initial_seed+seed_range):
-			this_result = convert_seed(x, conversion_maps)
-			min_found = min(min_found, this_result)
-
-	print(min_found)
 
 def main(is_test):
 	initial_seeds, conversion_maps = get_data(is_test)
 	part_1(initial_seeds, conversion_maps)
-	#part_2(initial_seeds, conversion_maps)
+	part_2(initial_seeds, conversion_maps)
 
 if __name__ == "__main__":
 	is_test = len(sys.argv) > 1 and sys.argv[1].lower() == '--test'
