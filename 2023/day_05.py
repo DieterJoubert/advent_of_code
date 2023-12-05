@@ -1,12 +1,6 @@
 from collections import deque
 
-DATA_PATH = './test_data/input_05.txt'
-
-class ConversionMap():
-	def __init__(self, destination_range_start, source_range_start, range_length):
-		self.destination_range_start = destination_range_start
-		self.source_range_start = source_range_start
-		self.range_length = range_length
+DATA_PATH = './data/input_05.txt'
 
 def get_data():
 	with open(DATA_PATH) as f:
@@ -34,16 +28,23 @@ def get_data():
 
 	return initial_seeds, maps
 
+def convert_seed(seed, conversion_maps):
+	for single_map in conversion_maps:
+		for (destination_start, source_start, range_length) in single_map:
+			if seed in range(source_start, source_start+range_length):
+				delta = seed - source_start
+				seed = destination_start + delta
+				break
+	return seed
 
-def part_1():
-	pass
+def part_1(initial_seeds, conversion_maps):
+	final_values = [convert_seed(x, conversion_maps) for x in initial_seeds]
+	print(final_values)
+	print(min(final_values))
 
 def main():
 	initial_seeds, conversion_maps = get_data()
-	print(initial_seeds)
-	print(conversion_maps)
-
-	part_1()
+	part_1(initial_seeds, conversion_maps)
 
 if __name__ == "__main__":
 	main()
