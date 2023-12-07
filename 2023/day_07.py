@@ -95,18 +95,12 @@ def execute(data, is_part_one):
 
 	for hand_type in HAND_TYPES:
 		hands_in_bucket = buckets[hand_type]
-		if len(hands_in_bucket) == 1:
-			final_ranking.append(hands_in_bucket[0])
-		elif len(hands_in_bucket) > 1:
+		if hands_in_bucket:
 			sorted_hands = sorted(hands_in_bucket, key=cmp_to_key(lambda x, y: card_compare(x, y, CARD_TYPES)))
 			for hand in sorted_hands:
 				final_ranking.append(hand)
 
-	total_score = 0
-
-	for idx, hand in enumerate(final_ranking[::-1]):
-		total_score += (idx+1) * hand_to_bid[hand]
-
+	total_score = sum([(idx+1) * hand_to_bid[hand] for idx, hand in enumerate(final_ranking[::-1])])
 	return total_score
 
 def main(is_test):
@@ -114,11 +108,13 @@ def main(is_test):
 
 	part_1_result = execute(data, is_part_one=True)
 	print("Part 1: " + str(part_1_result))
-	assert part_1_result == 252656917
+	if not is_test: 
+		assert part_1_result == 252656917
 
 	part_2_result = execute(data, is_part_one=False)
 	print("Part 2: " + str(part_2_result))
-	assert part_2_result == 253499763
+	if not is_test: 
+		assert part_2_result == 253499763
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
