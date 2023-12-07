@@ -6,7 +6,6 @@ DATA_PATH = './data/input_06.txt'
 
 def get_data_1(is_test):
 	path = TEST_PATH if is_test else DATA_PATH
-
 	with open(path) as f:
 		lines = list(map(str.split, f.read().splitlines()))
 		data = list(zip(map(int, lines[0][1:]), map(int, lines[1][1:])))
@@ -14,7 +13,6 @@ def get_data_1(is_test):
 	
 def get_data_2(is_test):
 	path = TEST_PATH if is_test else DATA_PATH
-
 	with open(path) as f:
 		lines = list(map(str.split, f.read().splitlines()))
 		time, distance = int("".join(lines[0][1:])), int("".join(lines[1][1:]))
