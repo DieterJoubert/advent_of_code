@@ -20,12 +20,12 @@ def get_hand_counter(hand):
 	return counter
 
 def get_joker_hand_counter(hand):
-	jokers = 0
+	num_jokers = 0
 	counter = {}
 
 	for c in hand:
 		if c == 'J':
-			jokers += 1
+			num_jokers += 1
 		elif c not in counter:
 			counter[c] = 1
 		else:
@@ -37,7 +37,7 @@ def get_joker_hand_counter(hand):
 	counter_items = sorted(list(counter.items()), key=lambda x: x[1])
 	max_item = counter_items[-1]
 
-	for _ in range(jokers):
+	for _ in range(num_jokers):
 		counter[max_item[0]] += 1
 	
 	return counter
