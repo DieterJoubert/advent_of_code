@@ -69,7 +69,7 @@ def card_compare(item_1, item_2, CARD_TYPES):
 			return 1
 	raise Exception("Could not decide on comparison of hands")
 
-def execute(data, is_part_one=True):
+def execute(data, is_part_one):
 	HAND_TYPES = Enum('CARD_TYPES', [
 		'FIVE_OF_A_KIND',
 		'FOUR_OF_A_KIND',
@@ -112,7 +112,7 @@ def execute(data, is_part_one=True):
 def main(is_test):
 	data = get_data(is_test)
 
-	part_1_result = execute(data)
+	part_1_result = execute(data, is_part_one=True)
 	print("Part 1: " + str(part_1_result))
 	assert part_1_result == 252656917
 
