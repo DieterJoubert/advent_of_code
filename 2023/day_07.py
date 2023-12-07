@@ -113,12 +113,12 @@ def main(is_test):
 	data = get_data(is_test)
 
 	part_1_result = execute(data)
-	assert part_1_result == 252656917
 	print("Part 1: " + str(part_1_result))
+	assert part_1_result == 252656917
 
 	part_2_result = execute(data, is_part_one=False)
-	assert part_2_result == 253499763
 	print("Part 2: " + str(part_2_result))
+	assert part_2_result == 253499763
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
