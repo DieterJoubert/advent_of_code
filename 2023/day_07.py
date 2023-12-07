@@ -5,18 +5,6 @@ from functools import cmp_to_key
 TEST_PATH = './test_data/input_07.txt'
 DATA_PATH = './data/input_07.txt'
 
-HAND_TYPES = Enum('CARD_TYPES', [
-	'FIVE_OF_A_KIND',
-	'FOUR_OF_A_KIND',
-	'FULL_HOUSE',
-	'THREE_OF_A_KIND',
-	'TWO_PAIR',
-	'ONE_PAIR',
-	'HIGH_CARD'
-])
-
-CARD_TYPES = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
-
 def get_data(is_test):
 	path = TEST_PATH if is_test else DATA_PATH
 	with open(path) as f:
@@ -31,69 +19,106 @@ def get_hand_counter(hand):
 		counter[c] = counter.get(c, 0) + 1
 	return counter
 
-def get_card_bucket(hand_counter):
+def get_joker_hand_counter(hand):
+	jokers = 0
+	counter = {}
+
+	for c in hand:
+		if c == 'J':
+			jokers += 1
+		elif c not in counter:
+			counter[c] = 1
+		else:
+			counter[c] += 1
+
+	if not counter: #edge case where only Jokers in hand
+		return {'J': 5}
+
+	counter_items = sorted(list(counter.items()), key=lambda x: x[1])
+	max_item = counter_items[-1]
+
+	for _ in range(jokers):
+		counter[max_item[0]] += 1
+	
+	return counter
+
+def get_card_bucket(hand_counter, hand_types):
 	vals = list(hand_counter.values())
 
 	if 5 in vals:
-		return HAND_TYPES.FULL_HOUSE
+		return hand_types.FIVE_OF_A_KIND
 	if 4 in vals:
-		return HAND_TYPES.FOUR_OF_A_KIND
+		return hand_types.FOUR_OF_A_KIND
 	if 3 in vals and 2 in vals:
-		return HAND_TYPES.FULL_HOUSE
+		return hand_types.FULL_HOUSE
 	if 3 in vals:
-		return HAND_TYPES.THREE_OF_A_KIND
+		return hand_types.THREE_OF_A_KIND
 	if 2 in vals and vals.index(2) != (len(vals) - 1 - vals[::-1].index(2)):
-		return HAND_TYPES.TWO_PAIR
+		return hand_types.TWO_PAIR
 	if 2 in vals:
-		return HAND_TYPES.ONE_PAIR
+		return hand_types.ONE_PAIR
 	if 1 in vals and len(set(vals)) == 1:
-		return HAND_TYPES.HIGH_CARD
-	raise Exception('how did you get here')
+		return hand_types.HIGH_CARD
+	raise Exception('Could not place hand into bucket')
 
-def compare(item_1, item_2):
+def card_compare(item_1, item_2, CARD_TYPES):
 	for idx in range(len(item_1)):
 		if CARD_TYPES.index(item_1[idx]) < CARD_TYPES.index(item_2[idx]):
 			return -1
 		elif CARD_TYPES.index(item_1[idx]) > CARD_TYPES.index(item_2[idx]):
 			return 1
-	raise Exception("Could not compare")
+	raise Exception("Could not decide on comparison of hands")
 
-def part_1(data):
+def execute(data, is_part_one=True):
+	HAND_TYPES = Enum('CARD_TYPES', [
+		'FIVE_OF_A_KIND',
+		'FOUR_OF_A_KIND',
+		'FULL_HOUSE',
+		'THREE_OF_A_KIND',
+		'TWO_PAIR',
+		'ONE_PAIR',
+		'HIGH_CARD'
+	])
+
+	CARD_TYPES = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'] if is_part_one else ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+
 	buckets = {e: [] for e in HAND_TYPES}
 
 	hand_to_bid = {hand: int(bid) for (hand, bid) in data}
 
 	for hand, _ in data:
-		hand_counter = get_hand_counter(hand)
-		bucket_to_place_in = get_card_bucket(hand_counter)
-		print(hand, bucket_to_place_in)
+		hand_counter = get_hand_counter(hand) if is_part_one else get_joker_hand_counter(hand)
+		bucket_to_place_in = get_card_bucket(hand_counter, HAND_TYPES)
 		buckets[bucket_to_place_in].append(hand)
 
 	final_ranking = []
 
 	for hand_type in HAND_TYPES:
-		print(hand_type)
 		hands_in_bucket = buckets[hand_type]
 		if len(hands_in_bucket) == 1:
 			final_ranking.append(hands_in_bucket[0])
 		elif len(hands_in_bucket) > 1:
-			sorted_hands = sorted(hands_in_bucket, key=cmp_to_key(compare))
+			sorted_hands = sorted(hands_in_bucket, key=cmp_to_key(lambda x, y: card_compare(x, y, CARD_TYPES)))
 			for hand in sorted_hands:
 				final_ranking.append(hand)
-
-	print("FINAL")
-	print(final_ranking)
 
 	total_score = 0
 
 	for idx, hand in enumerate(final_ranking[::-1]):
 		total_score += (idx+1) * hand_to_bid[hand]
 
-	print(total_score)
+	return total_score
 
 def main(is_test):
 	data = get_data(is_test)
-	part_1(data)
+
+	part_1_result = execute(data)
+	assert part_1_result == 252656917
+	print("Part 1: " + str(part_1_result))
+
+	part_2_result = execute(data, is_part_one=False)
+	assert part_2_result == 253499763
+	print("Part 2: " + str(part_2_result))
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
