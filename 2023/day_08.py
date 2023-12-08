@@ -19,25 +19,27 @@ def get_data(is_test, is_part_one):
 		
 		return instructions, graph
 
-def get_steps_for_single_node(start_node, end_on_zzz, instructions, graph):
+def get_next_node(curr_node, instruction, graph):
+	neighbors = graph[curr_node]
+
+	if instruction == 'L':
+		return neighbors[0]
+	elif instruction == 'R':
+		return neighbors[1]
+	else:
+		raise Exception("Invalid instruction")
+	
+def get_steps_for_single_node(start_node, end_condition, instructions, graph):
 	curr_node = start_node
 	curr_instruction_idx = 0
 	steps = 0
 
 	while True:
-		if (curr_node == 'ZZZ' if end_on_zzz else curr_node[-1] == 'Z'):
+		if end_condition(curr_node):
 			break
 		
-		node_neighbors = graph[curr_node]
 		curr_instruction = instructions[curr_instruction_idx]
-
-		if curr_instruction == 'L':
-			curr_node = node_neighbors[0]
-		elif curr_instruction == 'R':
-			curr_node = node_neighbors[1]
-		else:
-			raise Exception("Invalid instruction")
-		
+		curr_node = get_next_node(curr_node, curr_instruction, graph)
 		steps += 1
 		
 		curr_instruction_idx += 1
@@ -48,21 +50,11 @@ def get_steps_for_single_node(start_node, end_on_zzz, instructions, graph):
 
 def part_1(instructions, graph):
 	START_NODE = 'AAA'
-	return get_steps_for_single_node(START_NODE, True, instructions, graph)
-
-def get_next_node(curr_node, instruction, graph):
-	neighbors = graph[curr_node]
-
-	if instruction == 'L':
-		return neighbors[0]
-	elif instruction == 'R':
-		return neighbors[1]
-	else:
-		raise Exception("Invalid instruction")
+	return get_steps_for_single_node(START_NODE, lambda node: node == 'ZZZ', instructions, graph)
 
 def part_2(instructions, graph):
 	start_nodes = [x for x in graph.keys() if x[-1] == 'A']
-	steps_per_node = [get_steps_for_single_node(x, False, instructions, graph) for x in start_nodes]
+	steps_per_node = [get_steps_for_single_node(x, lambda node: node[-1] == 'Z', instructions, graph) for x in start_nodes]
 	return math.lcm(*steps_per_node)
 	
 def main(is_test):
