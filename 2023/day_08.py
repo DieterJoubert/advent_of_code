@@ -1,11 +1,16 @@
 import sys
 import math
 
-TEST_PATH = './test_data/input_08'
-DATA_PATH = './data/input_08'
+TEST_PATH_P1 = './test_data/input_08_p1.txt'
+TEST_PATH_P2 = './test_data/input_08_p2.txt'
+DATA_PATH = './data/input_08.txt'
 
 def get_data(is_test, is_part_one):
-	path = (TEST_PATH if is_test else DATA_PATH) + ('_p1.txt' if is_part_one else '_p2.txt')
+	if is_test:
+		path = TEST_PATH_P1 if is_part_one else TEST_PATH_P2
+	else:
+		path = DATA_PATH
+
 	print(path)
 	with open(path) as f:
 		lines = f.read().splitlines()
@@ -34,10 +39,7 @@ def get_steps_for_single_node(start_node, end_condition, instructions, graph):
 	curr_instruction_idx = 0
 	steps = 0
 
-	while True:
-		if end_condition(curr_node):
-			break
-		
+	while not end_condition(curr_node):
 		curr_instruction = instructions[curr_instruction_idx]
 		curr_node = get_next_node(curr_node, curr_instruction, graph)
 		steps += 1
