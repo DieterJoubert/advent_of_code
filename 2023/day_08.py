@@ -57,7 +57,15 @@ def part_2(instructions, graph):
 	start_nodes = [x for x in graph.keys() if x[-1] == 'A']
 	steps_per_node = [get_steps_for_single_node(x, lambda node: node[-1] == 'Z', instructions, graph) for x in start_nodes]
 	return math.lcm(*steps_per_node)
-	
+
+def assertions(is_test, result_1, result_2):
+	if is_test:
+		assert result_1 == 2
+		assert result_2 == 6
+	else:
+		assert result_1 == 16271
+		assert result_2 == 14265111103729
+
 def main(is_test):
 	instructions_1, graph_1 = get_data(is_test, True)
 	steps_1 = part_1(instructions_1, graph_1)
@@ -66,6 +74,8 @@ def main(is_test):
 	instructions_2, graph_2 = get_data(is_test, False)
 	steps_2 = part_2(instructions_2, graph_2)
 	print('PART 2: ' + str(steps_2))
+
+	assertions(is_test, steps_1, steps_2)
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
