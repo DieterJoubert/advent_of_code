@@ -11,7 +11,6 @@ def get_data(is_test, is_part_one):
 	else:
 		path = DATA_PATH
 
-	print(path)
 	with open(path) as f:
 		lines = f.read().splitlines()
 
@@ -62,11 +61,11 @@ def part_2(instructions, graph):
 def main(is_test):
 	instructions_1, graph_1 = get_data(is_test, True)
 	steps_1 = part_1(instructions_1, graph_1)
-	print(steps_1)
+	print('PART 1: ' + str(steps_1))
 
 	instructions_2, graph_2 = get_data(is_test, False)
 	steps_2 = part_2(instructions_2, graph_2)
-	print(steps_2)
+	print('PART 2: ' + str(steps_2))
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
