@@ -31,7 +31,7 @@ def get_next_node(curr_node, instruction, graph):
 	elif instruction == 'R':
 		return neighbors[1]
 	else:
-		raise Exception("Invalid instruction")
+		raise ValueError("Invalid instruction")
 	
 def get_steps_for_single_node(start_node, end_condition, instructions, graph):
 	curr_node = start_node

@@ -59,7 +59,7 @@ def get_card_bucket(hand_counter, hand_types):
 		return hand_types.ONE_PAIR
 	if 1 in vals and len(set(vals)) == 1:
 		return hand_types.HIGH_CARD
-	raise Exception('Could not place hand into bucket')
+	raise ValueError('Could not place hand into bucket')
 
 def card_compare(item_1, item_2, CARD_TYPES):
 	for idx in range(len(item_1)):
@@ -67,7 +67,7 @@ def card_compare(item_1, item_2, CARD_TYPES):
 			return -1
 		elif CARD_TYPES.index(item_1[idx]) > CARD_TYPES.index(item_2[idx]):
 			return 1
-	raise Exception("Could not decide on comparison of hands")
+	raise ValueError("Could not decide on comparison of hands")
 
 def execute(data, is_part_one):
 	HAND_TYPES = Enum('CARD_TYPES', [
