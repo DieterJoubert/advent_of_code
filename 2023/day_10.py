@@ -1,7 +1,8 @@
 import sys
 from collections import deque
 
-TEST_PATH = './test_data/input_10.txt'
+TEST_PATH_1 = './test_data/input_10_p1.txt'
+TEST_PATH_2 = './test_data/input_10_p2.txt'
 DATA_PATH = './data/input_10.txt'
 
 NORTH_AND_SOUTH = '|'
@@ -12,8 +13,11 @@ SOUTH_AND_WEST = '7'
 SOUTH_AND_EAST = 'F'
 START = 'S'
 
-def get_data(is_test):
-	path = TEST_PATH if is_test else DATA_PATH
+def get_data(is_test, is_part_one):
+	if is_test:
+		path = TEST_PATH_1 if is_part_one else TEST_PATH_2
+	else:
+		path = DATA_PATH
 	with open(path) as f:
 		lines = f.read().splitlines()
 		return [list(x) for x in lines]
@@ -59,7 +63,6 @@ def get_connected_neighbors(curr_coords, curr_symbol, neighbors):
 	connected_sides = get_connected_sides(curr_symbol)
 
 	for side in connected_sides:
-		print(side)
 		neighbor = neighbors.get(side, None)
 		if neighbor:
 			if side == 'UP' and 'DOWN' in get_connected_sides(neighbor):
@@ -89,9 +92,7 @@ def explore(grid, starting_point):
 		curr_symbol = grid[curr_coords[0]][curr_coords[1]]
 
 		neighbors = get_neighbors(grid, curr_coords)
-		print(neighbors)
 		connected_neighbor_coords = get_connected_neighbors(curr_coords, curr_symbol, neighbors)
-		print(connected_neighbor_coords)
 
 		for neighbor_coord in connected_neighbor_coords:
 			if neighbor_coord not in explored:
@@ -101,17 +102,9 @@ def explore(grid, starting_point):
 
 
 
-
-
-
-
-
 def part_1(grid):
 	starting_coords = get_starting_coords(grid)
-	print(starting_coords)
-
 	distances = explore(grid, starting_coords)
-	print(distances)
 	return distances
 
 def assertions(is_test, result_1, result_2):
@@ -122,12 +115,13 @@ def assertions(is_test, result_1, result_2):
 
 
 def main(is_test):
-	data = get_data(is_test)
-	for d in data:
-		print(d)
-
-	result_1 = part_1(data)
+	data_1 = get_data(is_test, True)
+	result_1 = part_1(data_1)
 	print(max(result_1.values()))
+
+	data_2 = get_data(is_test, False)
+
+	assertions(is_test, result_1, None)
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
