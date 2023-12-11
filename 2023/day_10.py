@@ -1,5 +1,7 @@
 import sys
+import math
 from collections import deque
+from functools import reduce
 
 TEST_PATH_1 = './test_data/input_10_p1.txt'
 TEST_PATH_2 = './test_data/input_10_p2.txt'
@@ -100,28 +102,55 @@ def explore(grid, starting_point):
 	
 	return distances
 
-
-
 def part_1(grid):
 	starting_coords = get_starting_coords(grid)
 	distances = explore(grid, starting_coords)
-	return distances
+	return max(distances.values())
+
+def part_2(grid):
+	starting_coords = get_starting_coords(grid)
+	distances = explore(grid, starting_coords)
+
+	#replace S with correct pipe
+
+	#explore
+
+
+# def part_2(grid):
+# 	starting_coords = get_starting_coords(grid)
+# 	distances = explore(grid, starting_coords)
+# 	print("PART TWO")
+
+# 	distances_keys = list(distances.keys())
+
+# 	area_of_polygon = 0
+# 	for i in range(len(distances_keys)-1):
+# 		area_of_polygon += distances_keys[i][0] * distances_keys[i+1][1] - distances_keys[i+1][0] * distances_keys[i][1]
+# 	area_of_polygon = 0.5 * max(area_of_polygon, -area_of_polygon)
+
+# 	print('area', area_of_polygon)
+# 	print("circ?", max(distances.values()))
+
+# 	return area_of_polygon - len(distances_keys)
 
 def assertions(is_test, result_1, result_2):
 	if is_test:
-		result_1 == 8
+		assert result_1 == 8
+		assert result_2 == 10
 	else:
-		result_1 == 6812
+		assert result_1 == 6812
 
 
 def main(is_test):
 	data_1 = get_data(is_test, True)
 	result_1 = part_1(data_1)
-	print(max(result_1.values()))
+	print()
 
 	data_2 = get_data(is_test, False)
+	result_2 = part_2(data_2)
+	print('result 2', result_2)
 
-	assertions(is_test, result_1, None)
+	assertions(is_test, result_1, result_2)
 
 if __name__ == "__main__":
 	main(len(sys.argv) > 1 and sys.argv[1].lower() == '--test')
