@@ -44,7 +44,7 @@ def get_galaxy_name_to_coords(grid):
 	return galaxy_name_to_coords
 
 def execute(grid, is_part_one):
-	expansion_factor = 1 if is_part_one else 100
+	expansion_factor = 1 if is_part_one else 1000000
 
 	empty_rows, empty_columns = get_empty_rows_and_columns(grid)
 
@@ -59,8 +59,8 @@ def execute(grid, is_part_one):
 				x_coords = galaxy_name_to_coords[x]
 				y_coords = galaxy_name_to_coords[y]
 
-				num_empty_rows_crossed = len([i for i in range(min(x_coords[0], y_coords[0]), max(x_coords[0], y_coords[0])) if i in empty_rows])
-				num_empty_columns_crossed = len([i for i in range(min(x_coords[1], y_coords[1]), max(x_coords[1], y_coords[1])) if i in empty_columns])
+				num_empty_rows_crossed = len([i for i in range(min(x_coords[0], y_coords[0])+1, max(x_coords[0]+1, y_coords[0])) if i in empty_rows])
+				num_empty_columns_crossed = len([i for i in range(min(x_coords[1], y_coords[1])+1, max(x_coords[1]+1, y_coords[1])) if i in empty_columns])
 				
 				manhattan_distance = abs(x_coords[0] - y_coords[0]) + abs(x_coords[1] - y_coords[1])
 				manhattan_distance += ((num_empty_rows_crossed + num_empty_columns_crossed ) * expansion_factor)
